@@ -3,32 +3,34 @@ name: Deploy to EC2 via SSH
 on:
   push:
     branches:
-      - main  # Cambia esto si tu rama principal tiene otro nombre
+      - main  
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Checkout del código del repositorio
+    
     - name: Checkout code
       uses: actions/checkout@v2
 
-    # 2. Configurar la clave SSH para conectarse a la instancia EC2
+    
     - name: Set up SSH key
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-    # 3. Conexión por SSH a la instancia EC2 y despliegue de la aplicación
+    
     - name: SSH into EC2 and deploy
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-          # Actualizar paquetes e instalar Docker si es necesario
+          # packages
+
           sudo apt-get update
           sudo apt-get install -y docker.io docker-compose
 
-          # Clonar el repositorio o actualizar si ya existe
+          # Clone rep
+
           cd /home/ubuntu
           if [ ! -d "page" ]; then
             git clone https://github.com/EAllaucaD/page.git
@@ -37,13 +39,15 @@ jobs:
             git pull origin main
           fi
 
-          # Detener y eliminar cualquier contenedor nginx existente
+          # Stop ngix if
+
           sudo docker rm -f web || true
 
-          # Ejecutar Nginx con tu archivo HTML
+          # Run nginx
+
           sudo docker run -d -p 80:80 --name web \
             -v /home/ubuntu/page/index.html:/usr/share/nginx/html/index.html \
             nginx
 
-          echo "¡Aplicación desplegada con éxito y sirviendo tu página index.html!"
+          echo "¡Deploy App with html!"
         EOF
