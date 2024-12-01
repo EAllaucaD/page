@@ -47,7 +47,7 @@ jobs:
           # Run nginx
 
           sudo docker run -d -p 80:80 --name web \
-            -v /home/ubuntu/page/index.html:/usr/share/nginx/html/index.html \
+            -v /home/ubuntu/page:/usr/share/nginx/html \
             nginx
 
           echo "¡Deploy App with html!"
